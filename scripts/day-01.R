@@ -29,9 +29,7 @@ count_stops <- function(stop_num) {
 }
 
 # Example Instructions
-instructions <- c("L68", "L30", "R48", "L5", "R60", "L55", 
-                 "L1", "L99", "R14", "L82")
-
+instructions <- readLines("data/day-01_part1_example.txt", )
 all_dial_turns <- turn_dial(instructions)
 
 example_part1 <- count_stops(stop_num = 0)
@@ -4305,7 +4303,7 @@ count_passes_v3 <- function() {
 all_dial_turns <- turn_dial(instructions)
 example_part2_v3 <- count_passes_v3()
 
-
+real_instructions <- readLines("data/day-01_part1.txt", )
 all_dial_turns <- turn_dial(real_instructions)
 answer_part2_v3 <- count_passes_v3()
 # 5879 is wrong

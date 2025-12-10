@@ -35,7 +35,7 @@ all_dial_turns <- turn_dial(instructions)
 example_part1 <- count_stops(stop_num = 0)
 
 # Real Instructions
-real_instructions <- readLines("data/day-01_part1_example.txt")
+real_instructions <- readLines("data/day-01_part1.txt")
 all_dial_turns <- turn_dial(real_instructions)
 
 answer <- count_stops(stop_num = 0)
@@ -49,6 +49,7 @@ count_passes <- function() {
     passes <- abs(floor(new / (dial_max - dial_min + 1)))
     counter_pass <- counter_pass + passes
     start <- new %% (dial_max - dial_min + 1)
+    print(paste(new, passes, counter_pass, start))
   }
   return(counter_pass)
 }

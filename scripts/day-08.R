@@ -143,3 +143,86 @@ dist_matrix <- dist_matrix[order(dist_matrix$distance),]
 input_answer <- get_circuits(dist_matrix, input_matrix, n_circuit_max = 1000)
 
 calculate_circuit_size(input_answer, 3)
+
+## Part 2 ----------------------------------------------------------------------
+
+# Modify get_circuits to run until the criteria is reach, instead of running for
+#  a set number of times, n_circuit_max
+get_circuits <- function(input_dist, input_matrix){
+  dim_nrow <- dim(input_matrix)[1]
+  df <- as.data.frame(input_matrix)
+  df$circuit <- rep(0, dim_nrow)
+  circuit_count <- 1
+  i <- 1
+  while (length(unique(df$circuit)) > 1 | sum(df$circuit) == 0) {
+  # for (i in 1:n_circuit_max) {
+    # Set the first circuit to 1
+    if (i == 1) {
+      df$circuit[dist_matrix[i, "row"]] <- 1
+      df$circuit[dist_matrix[i, "col"]] <- 1
+    } else if (i > 1) {
+      # Get the two pairs in the distance matrix
+      row <- dist_matrix[i, "row"]
+      col <- dist_matrix[i, "col"]
+      # Get the current circuit for each junction box
+      row_circuit <- df$circuit[row]
+      col_circuit <- df$circuit[col]
+      
+      # If one of the boxes is part of a circuit, then the other joins it
+      if (row_circuit > 0 & col_circuit == 0) {
+        df$circuit[col] <- row_circuit
+      } else if (row_circuit == 0 & col_circuit > 0) {
+        df$circuit[row] <- col_circuit
+      } else if (row_circuit == 0 & col_circuit == 0) {
+        # If neither is in a circuit, then they create a new circuit together
+        circuit_count <- circuit_count + 1
+        df$circuit[row] <- circuit_count
+        df$circuit[col] <- circuit_count
+      } else if (row_circuit >  0 & col_circuit > 0) {
+        # If they are on the same circuit then do nothing,
+        #  otherwise join all items on the circuit together
+        if (row_circuit != col_circuit){
+          circuit_count <- circuit_count + 1
+          df[df$circuit == row_circuit, "circuit"] <- circuit_count
+          df[df$circuit == col_circuit, "circuit"] <- circuit_count
+        }
+      }
+    }
+    # If exit criteria is reached, it is because iteration i-1 met it.
+    i <- i + 1
+  }
+  return(list(df, i))
+}
+
+# Example
+example_matrix <- convert_to_matrix(example_input)
+example_diag <- pairs(example_matrix)
+example_dist <- distance(
+  example_diag$x1, example_diag$y1, example_diag$z1, 
+  example_diag$x2, example_diag$y2, example_diag$z2
+)
+
+dist_matrix <- example_diag
+dist_matrix$distance <- example_dist
+dist_matrix <- dist_matrix[order(dist_matrix$distance),]
+
+example_part2 <- get_circuits(dist_matrix, example_matrix)
+example_exit_row <- dist_matrix[example_part2[[2]] - 1,]
+example_answer <- example_exit_row$x1 * example_exit_row$x2
+
+
+# Run on input
+input_matrix <- convert_to_matrix(input)
+input_diag <- pairs(input_matrix)
+input_dist <- distance(
+  input_diag$x1, input_diag$y1, input_diag$z1, 
+  input_diag$x2, input_diag$y2, input_diag$z2
+)
+
+dist_matrix <- input_diag
+dist_matrix$distance <- input_dist
+dist_matrix <- dist_matrix[order(dist_matrix$distance),]
+
+input_part2 <- get_circuits(dist_matrix, input_matrix)
+input_exit_row <- dist_matrix[input_part2[[2]] - 1,]
+input_answer <- input_exit_row$x1 * input_exit_row$x2
